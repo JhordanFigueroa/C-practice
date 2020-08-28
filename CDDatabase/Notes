@@ -1,0 +1,6 @@
+Given a file pointer, f, what does this code do?
+fseek(f, 0, SEEK_END);
+--It moves the file pointer to the end of the file
+
+What is the -> operator?
+it lets you access the fields of a struct to which a pointer is pointing e.g cdptr -> name

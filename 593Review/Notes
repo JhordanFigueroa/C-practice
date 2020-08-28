@@ -1,0 +1,135 @@
+In C: there is no object but there is a struct
+
+typedef struct {
+    int numerator;
+    int denominator;
+
+} fraction;
+
+When declaring variables on the stack - need to initialize or else it will be pointing to something else
+
+
+Pointer - location of memory address where a value is located. Used to passes addresses into functions
+because C is pass by value
+Always want to initialize a pointer to a variable or at least NULL - will cause a segmentation fault otherwise
+*ptr += 5; -- this is how you update the value of the pointer by dereferencing
+
+Advantages:
+Pointer:
+Double Pointer: pointer to a pointer - value is memory location:
+--dereferencing once - address of pointer -
+--derefincing twice - value at the memory address
+
+Can do Pointer arithmetic by derefercing pointers:
+*var = (*var) * (*var);
+var++;
+
+
+STACK:
+starts at the bottom of the stack - x7FFF, x7FFE
+starts with argv, then number of arguments (argc)
+EXAMPLE: int main (int argc, char** argv) - say you compile and run ./program1 filename
+argv would be a char array containing: ./program1 and filename
+argc would be 2 because it is two arguments
+argv is but on the Global Memory, the correspoinding address is then put on the stack to access, then number of arguments
+which is argc
+
+STACK Example:
+
+x7FF6   local variables in function - arguments are read in right to left
+x7FF7   FP      - main frame pointer - which in this case would be x7FFB
+x7FF8   RA      - main return address
+x7FF9   RV      -main return value - which would be the address of any function passed in main
+x7FFA   local variables - variables in main
+x7FFB   FP     - Frame Pointer R5
+x7FFC   RA     - return address
+x7FFD   RV     - Return Value
+x7FFE   2      - number of arguments argc
+x7FFF   x2001  - pointer to global memory values of argv
+
+CONSTANTS:
+use modifier with const - do have space allocated to them - use when you don't want to change
+using a directive #define - they are are like assembly directives - don't get space allocated - you may want to change
+ ---next time you compile
+declared before main
+#define RADIUS 15.0
+
+COMPILING A C PROGRAM:
+START: with source code [sample.c]-> exapnded source code [sample.i] -> (compiler) Assembly Source Code [sample.s]->
+(Assembler) Object Code [sample.o] -> (Linker) Executable code [sample.exe] -> (Loader) -> Execution
+
+HEADER FILES - WE USE BECAUSE OF BUILD TIME - ITS MUCH FASTER AND REDUCE OVERHEAD, BECAUSE EVERYTHING IS COMPRESSED
+
+
+STRINGS:
+char myString[4] = {'H', 'o', 'T', '\0'}; //need a null terminating character at the end. Also the number of spaces
+declaration [4] needs to be enough for your string + the null terminating character
+Examples of declarations: all are valid for declaring a char array
+char str[3] = {'H', 'o', '\0'};
+char str[3] = "Hi"; //in double quotes the compiler will automatically include the null terminating character
+char str[] = "hi";
+char str[] = {'H', 'i', '\0'};
+
+ON STACK: char str[3] = {'H', 'o', '\0'};
+
+address with label str 'H' str[0]
+address                'i' str[1]
+address                '\0' str[2]
+address                FP
+address                RA
+
+STRING LITERAL:
+char* str = "I am a string literal"; //you cannot alter the values, the null terminating character is added at the end
+
+LOCAL MEMORY:
+on registers or stack
+at compile time - knows what registers it needs and what memory it needs
+
+DYNAMIC MEMORY ALLOCATION:
+Memory is allocated at run-time - means the cpu doesn't need to know how much space we need ahead of time
+Memory for this is stored on the heap
+
+malloc() - pass sizeof(data structure in bytes) - get from malloc a pointer to a region in memory
+--returns NULL if there is not enough memory that is contiguous on the heap
+--want to check for NULL everytime using malloc
+--"give me the address of an unused region of memory with this much size"
+--example: int* arrPtr = malloc((5*sizeof(int)) + 1); //need to account for null terminating character
+if (arrPtr == NULL) {return -1;}
+
+
+free() - want to free every instance of the heap usage, order matters when dealing with linkedlist
+--"i'm done with the memory starting at address"
+--if you fail to free completely - heaps frees up with memory locations you have no way of accessing
+-ex: typedef strut { int* number, char* string; } object
+
+int* obj1 = malloc(sizeof(object));
+if (obj1 == NULL) {return -1;}
+obj1.number = 2;
+obj1.string = "hello";
+
+free(obj1); //make sure obj1 is pointing to the first memory location of the original pointer
+free(obj1.number);
+free(obj1.string);
+
+Memory leaks: keep original pointer of array or object the same, if iterating create a copy of the
+original pointer. Memory leak happens because of heap
+
+LINKEDLIST: require dynamic memory allocation
+To add a node to a list:
+need to create two temp copies of the head node: pointer copies - current pointer and lead pointer
+--Two new pointers - one copy of head pointer and one pointer copy of next pointer
+--first find out where the new node should go in the list - find the node before and node after
+-the node before inserting node now points to inserting node
+-the inserting node now points to the node after
+
+Using double pointers: order in which you do change the pointers is important - point new node to larger node first
+-still need a copy of head list
+-Now only need a double pointer to the next address - jump around the next address by checking if value is greater than
+current value
+*ptr - would point to the "next" portion of new node - the whole address of the new node
+**ptr - would point to the "next" value of new node - would use double pointer to compare values
+
+*n_ptr= malloc(sizeof(newnode));
+n.box.next = *ptr - would point to the address of the larger node
+*ptr = n_ptr
+
